@@ -9,7 +9,7 @@ import ru.practicum.shareit.item.dto.ItemDtoUpdate;
 import java.util.List;
 
 /**
- * TODO Sprint add-controllers.
+ * Item контроллер.
  */
 @RestController
 @RequiredArgsConstructor

@@ -8,6 +8,9 @@ import ru.practicum.shareit.user.UserMapper;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Item mapper
+ */
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface ItemMapper {
     List<ItemDtoRead> entityToItemDtoReadList(Collection<ItemEntity> value);

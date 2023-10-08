@@ -6,7 +6,7 @@ import ru.practicum.shareit.user.UserEntity;
 import javax.persistence.*;
 
 /**
- * TODO Sprint add-controllers.
+ * Item Entity.
  */
 @Entity
 @Data
