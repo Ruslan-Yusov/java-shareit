@@ -1,20 +1,26 @@
 package ru.practicum.shareit.item;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingEntity;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exeption.BadRequestException;
 import ru.practicum.shareit.exeption.ResourceNotFoundException;
-import ru.practicum.shareit.item.dto.ItemDtoAdd;
-import ru.practicum.shareit.item.dto.ItemDtoRead;
-import ru.practicum.shareit.item.dto.ItemDtoUpdate;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.user.UserEntity;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
 
 /**
  * Item Service
@@ -29,30 +35,60 @@ public class ItemService {
     private UserRepository userRepository;
 
     @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
     private ItemMapper mapper;
 
+    @Autowired
+    private BookingMapper bookingMapper;
+
     public List<ItemDtoRead> getAllItem(Integer userId) {
-        return mapper.entityToItemDtoReadList(repository.findByOwnerId(userId));
+       return repository.findByOwnerId(userId).stream()
+                .map(mapper::entityToItemDtoRead)
+                .map(dto -> addLastBookingToDtoForOwner(dto.getId(), userId, dto))
+                .collect(Collectors.toList());
     }
 
     public List<ItemDtoRead> findBySubstr(String namePart) {
         return StringUtils.isBlank(namePart)
                 ? new ArrayList<>()
-                : mapper.entityToItemDtoReadList(
+                :
                 repository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(namePart, namePart)
                         .stream()
                         .filter(ItemEntity::getAvailable)
-                        .collect(Collectors.toList()));
+                        .map(mapper::entityToItemDtoRead)
+                        .collect(Collectors.toList());
     }
 
     public ItemDtoRead getByIdItem(Integer itemId, Integer userId) {
         return repository.findById(itemId)
                 .map(mapper::entityToItemDtoRead)
-                .orElseThrow(() -> new BadRequestException("Такой вещи нет"));
+                .map(dto -> addLastBookingToDtoForOwner(itemId, userId, dto))
+                .orElseThrow(() -> new ResourceNotFoundException("Такой вещи нет"));
+    }
+
+    @NotNull
+    private ItemDtoRead addLastBookingToDtoForOwner(Integer itemId, Integer userId, ItemDtoRead dto) {
+        if (dto.getOwner().getId() == userId) {
+            List<BookingEntity> bookingsByItemId = bookingRepository.findBookingsByItemId(itemId);
+            if (!bookingsByItemId.isEmpty()) {
+                BookingEntity booking1 = bookingsByItemId.get(0);
+                BookingEntity booking2 = (bookingsByItemId.size() > 1) ? bookingsByItemId.get(1) : null;
+                if (booking1.getStartDateTime().isAfter(LocalDateTime.now())) {
+                    dto.setNextBooking(bookingMapper.entityToBookingDtoReadSimple(booking1));
+                    dto.setLastBooking(bookingMapper.entityToBookingDtoReadSimple(booking2));
+                } else {
+                    dto.setLastBooking(bookingMapper.entityToBookingDtoReadSimple(booking1));
+                    dto.setNextBooking(bookingMapper.entityToBookingDtoReadSimple(booking2));
+                }
+            }
+        }
+        return dto;
     }
 
     public ItemDtoRead addItem(ItemDtoAdd itemDtoAdd, Integer userId) {
-        Optional.ofNullable(itemDtoAdd.getAvailable())
+        ofNullable(itemDtoAdd.getAvailable())
                 .orElseThrow(() -> new BadRequestException("Укажите статус доступности вещи"));
         if (StringUtils.isBlank(itemDtoAdd.getName()) || StringUtils.isEmpty(itemDtoAdd.getDescription())) {
             throw new BadRequestException("Имя не может быть пустым");
@@ -67,22 +103,49 @@ public class ItemService {
     public ItemDtoRead updateItem(ItemDtoUpdate itemDtoUpdate, Integer userId, Integer itemId) {
         ItemEntity item = repository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Такой вещи нет"));
-        Optional.ofNullable(item.getOwner())
+        ofNullable(item.getOwner())
                 .map(UserEntity::getId)
                 .filter(userId::equals)
                 .orElseThrow(() -> new ResourceNotFoundException("Этот пользователь не является владельцем вещи"));
-        Optional.ofNullable(itemDtoUpdate.getName()).map(value -> {
+        ofNullable(itemDtoUpdate.getName()).map(value -> {
             item.setName(value);
             return item;
         }).ifPresent(repository::save);
-        Optional.ofNullable(itemDtoUpdate.getDescription()).map(value -> {
+        ofNullable(itemDtoUpdate.getDescription()).map(value -> {
             item.setDescription(value);
             return item;
         }).ifPresent(repository::save);
-        Optional.ofNullable(itemDtoUpdate.getAvailable()).map(value -> {
+        ofNullable(itemDtoUpdate.getAvailable()).map(value -> {
             item.setAvailable(value);
             return item;
         }).ifPresent(repository::save);
         return mapper.entityToItemDtoRead(repository.save(item));
+    }
+
+    public CommentDtoRead addItemComment(Integer userId, Integer itemId, CommentDtoAdd commentDtoAdd) {
+        ItemEntity item = repository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Такой вещи нет"));
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Такого пользователя нет"));
+        if (0 == bookingRepository.countBookingByItemIdAndBookerId(itemId, userId)) {
+            throw new BadRequestException("Вы не бронировали эту вещь");
+        }
+        if (StringUtils.isBlank(commentDtoAdd.getText())) {
+            throw new BadRequestException("Не задан текст");
+        }
+        CommentEntity commentEntity = new CommentEntity(
+                null,
+                commentDtoAdd.getText(),
+                item,
+                userEntity,
+                LocalDateTime.now());
+        Set<CommentEntity> comment = item.getComments();
+        comment.add(commentEntity);
+        item.setComments(comment);
+        item = repository.save(item);
+        return item.getComments().stream()
+                .max(Comparator.comparing(CommentEntity::getCreated))
+                .map(mapper::entityToCommentDtoRead)
+                .orElseThrow();
     }
 }
