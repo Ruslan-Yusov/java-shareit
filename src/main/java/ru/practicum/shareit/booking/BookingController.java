@@ -8,7 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoRead;
 import java.util.List;
 
 /**
- * TODO Sprint add-bookings.
+ * Booking Controller
  */
 @RestController
 @RequiredArgsConstructor
