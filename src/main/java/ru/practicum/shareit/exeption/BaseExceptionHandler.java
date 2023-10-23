@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exeption;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +17,16 @@ public class BaseExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorDto> handleException(BadRequestException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorDto> handleException(DataIntegrityViolationException ex) {
+        return handleException(ex, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AccessForbiddenException.class)
+    public ResponseEntity<ErrorDto> handleException(AccessForbiddenException ex) {
+        return handleException(ex, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -43,6 +54,7 @@ public class BaseExceptionHandler {
         ErrorDto errorResponse = ErrorDto.builder()
                 .code(httpStatus.value())
                 .message(ex.getLocalizedMessage())
+                .messageForJuniorTester(ex.getLocalizedMessage())
                 .details(Stream.of(ex.getStackTrace())
                         .map(StackTraceElement::toString)
                         .collect(Collectors.toList()))
