@@ -13,7 +13,5 @@ public interface UserMapper {
 
     UserDtoRead entityToUserDtoForRead(UserEntity value);
 
-    UserEntity userDtoReadToUserEntity(UserDtoRead value);
-
     UserEntity userDtoAddToUserEntity(UserDtoAdd value);
 }

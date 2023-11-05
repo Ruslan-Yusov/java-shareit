@@ -21,16 +21,24 @@ public class BookingController {
     public List<BookingDtoRead> getUserBooking(@RequestHeader("X-Sharer-User-Id")
                                                Integer userId,
                                                @RequestParam(name = "state", required = false, defaultValue = "ALL")
-                                               String state) {
-        return bookingService.getAllUser(userId, state);
+                                               String state,
+                                               @RequestParam(name = "from", required = false)
+                                               Integer from,
+                                               @RequestParam(name = "size", required = false)
+                                               Integer size) {
+        return bookingService.getAllUserBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoRead> getOwnerBooking(@RequestHeader("X-Sharer-User-Id") Integer userId,
                                                   @RequestParam(name = "state",
                                                        required = false,
-                                                       defaultValue = "ALL") String state) {
-        return bookingService.getAllOwner(userId, state);
+                                                       defaultValue = "ALL") String state,
+                                       @RequestParam(name = "from",
+                                               required = false) Integer from,
+                                                @RequestParam(name = "size",
+                                                        required = false) Integer size) {
+        return bookingService.getAllOwner(userId, state, from, size);
     }
 
     @GetMapping("{bookingId}")
@@ -42,7 +50,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDtoRead updateBookingStatus(@RequestHeader("X-Sharer-User-Id") Integer userId,
                                               @PathVariable("bookingId") Integer id,
-                                              @RequestParam(name = "approved", required = true) boolean accept) {
+                                              @RequestParam(name = "approved") boolean accept) {
         return bookingService.updateBookingStatus(id, userId, accept);
     }
 

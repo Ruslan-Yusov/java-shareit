@@ -24,24 +24,9 @@ public class BaseExceptionHandler {
         return handleException(ex, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(AccessForbiddenException.class)
-    public ResponseEntity<ErrorDto> handleException(AccessForbiddenException ex) {
-        return handleException(ex, HttpStatus.FORBIDDEN);
-    }
-
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorDto> handleException(ResourceNotFoundException ex) {
         return handleException(ex, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(ResourceAlreadyExistExeption.class)
-    public ResponseEntity<ErrorDto> handleException(ResourceAlreadyExistExeption ex) {
-        return handleException(ex, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public ResponseEntity<ErrorDto> handleException(BaseException ex) {
-        return handleException(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(RuntimeException.class)

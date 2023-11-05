@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item.dto
 
 import ru.practicum.shareit.booking.dto.LastBookingDtoRead
 import ru.practicum.shareit.user.dto.UserDtoRead
@@ -15,7 +15,8 @@ data class ItemDtoRead(
     var available: Boolean? = false,
     var lastBooking: LastBookingDtoRead? = null,
     var nextBooking: LastBookingDtoRead? = null,
-    var comments: Set<CommentDtoRead>? = null
+    var comments: Set<CommentDtoRead>? = null,
+    var requestId: Int? = null
 )
 
 data class CommentDtoRead(

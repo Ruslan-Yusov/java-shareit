@@ -26,6 +26,8 @@ import static java.util.Optional.ofNullable;
 @Service
 public class BookingService {
 
+    public static final String MESSAGE_NO_USER_FOUND = "Такого пользователя нет";
+
     @Autowired
     private BookingRepository bookingRepository;
 
@@ -38,33 +40,46 @@ public class BookingService {
     @Autowired
     private ItemRepository itemRepository;
 
-    public List<BookingDtoRead> getAllUser(Integer id, String state) {
+    public List<BookingDtoRead> getAllUserBookings(Integer id, String state, Integer from, Integer size) {
         if (!Arrays.asList("CURRENT", "PAST", "FUTURE", "ALL", "REJECTED", "WAITING").contains(state)) {
             throw new BadRequestException(String.format("Unknown state: %s", state));
         }
-        userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Такого пользователя нет"));
-        Comparator<BookingDtoRead> comparator = Comparator.comparing(BookingDtoRead::getStart);
-        if (!"CURRENT".equals(state)) {
-            comparator = comparator.reversed();
+        int from1 = ofNullable(from).orElse(0);
+        int size1 = ofNullable(size).orElse(10000);
+        if (from1 < 0 || size1 <= 0) {
+            throw new BadRequestException("invalid paging");
         }
+        userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
+        Comparator<BookingDtoRead> comparator = Comparator
+                .comparing(BookingDtoRead::getStart)
+                .reversed();
         return bookingRepository.findByBookerIdAndState(id, state)
                 .stream()
                 .map(bookingMapper::entityToBookingDtoRead)
                 .sorted(comparator)
+                .skip(from1)
+                .limit(size1)
                 .collect(Collectors.toList());
     }
 
-    public List<BookingDtoRead> getAllOwner(Integer id, String state) {
+    public List<BookingDtoRead> getAllOwner(Integer id, String state, Integer from, Integer size) {
         if (!Arrays.asList("CURRENT", "PAST", "FUTURE", "ALL", "REJECTED", "WAITING").contains(state)) {
             throw new BadRequestException(String.format("Unknown state: %s", state));
         }
+        int from1 = ofNullable(from).orElse(0);
+        int size1 = ofNullable(size).orElse(10000);
+        if (from1 < 0 || size1 <= 0) {
+            throw new BadRequestException("invalid paging");
+        }
         userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Такого пользователя нет"));
+                .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
         return bookingRepository.findByOwnerIdAndState(id, state)
                 .stream()
                 .map(bookingMapper::entityToBookingDtoRead)
                 .sorted(Comparator.comparing(BookingDtoRead::getStart).reversed())
+                .skip(from1)
+                .limit(size1)
                 .collect(Collectors.toList());
     }
 
@@ -102,7 +117,7 @@ public class BookingService {
                 .filter(en -> en.isAfter(bookingDtoAdd.getStart()))
                 .orElseThrow(() -> new BadRequestException("Не задан обязательный параметр End или End указан раньше Start"));
         UserEntity user = userRepository.findById(idUser)
-                .orElseThrow(() -> new ResourceNotFoundException("Такого пользователя нет"));
+                .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
         ItemEntity item = itemRepository.findById(bookingDtoAdd.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Такой вещи нет или она не доступна"));
         if (BooleanUtils.isFalse(item.getAvailable())) {
@@ -125,7 +140,7 @@ public class BookingService {
         BookingEntity bookingEntity = bookingRepository.findById(idBooking)
                 .orElseThrow(() -> new ResourceNotFoundException("Такого запроса нет"));
         userRepository.findById(idUser)
-                .orElseThrow(() -> new ResourceNotFoundException("Такого пользователя нет"));
+                .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
         ofNullable(bookingEntity.getItem())
                 .map(ItemEntity::getOwner)
                 .map(UserEntity::getId)
