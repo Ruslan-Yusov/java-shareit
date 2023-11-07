@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.exeption.BadRequestException;
 import ru.practicum.shareit.exeption.ResourceNotFoundException;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.request.RequestService;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +49,9 @@ class ItemControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private ItemMapper itemMapper;
 
     @Test
     @SneakyThrows
@@ -94,6 +98,8 @@ class ItemControllerTest {
                 .get(0);
         Assertions.assertEquals(userId, ((Map<?, ?>)actual.get("owner")).get("id"));
         Assertions.assertEquals(expected.getId(), actual.get("id"));
+
+        verify(itemService, times(1)).getAllItem(userId);
 
         userId = 100;
         mockMvc.perform(get("/items")
@@ -262,10 +268,13 @@ class ItemControllerTest {
 
         Assertions.assertEquals(mapper.writeValueAsString(expected), actual);
 
+        verify(itemService, times(1)).addItem(itemDtoAdd, 1);
+
         itemDtoAdd.setAvailable(null);
         when(itemService.addItem(itemDtoAdd, 1))
                 .thenThrow(BadRequestException.class);
 
+        verify(itemMapper, never()).itemDtoAddToEntityItem(itemDtoAdd);
 
     }
 
@@ -322,5 +331,6 @@ class ItemControllerTest {
                 .getResponse().getContentAsString();
 
         Assertions.assertEquals(mapper.writeValueAsString(commentDtoRead), actual);
+        verify(itemService, times(1)).addItemComment(1, 1, commentDtoAdd);
     }
 }

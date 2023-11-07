@@ -78,6 +78,8 @@ class UserControllerTest {
         Assertions.assertEquals(expected.getName(), actual.getName());
         Assertions.assertEquals(expected.getEmail(), actual.getEmail());
 
+        verify(userService, times(1)).getUserDto(1);
+
         userId = 100;
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isNotFound());
@@ -96,6 +98,8 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse().getContentAsString();
+
+        verify(userService, times(1)).addUser(new UserDtoAdd("name", "email@mail.ru"));
 
         Assertions.assertEquals(mapper.writeValueAsString(expected), actual);
     }
@@ -129,6 +133,9 @@ class UserControllerTest {
                 .getContentAsString();
 
         Assertions.assertEquals(mapper.writeValueAsString(userDtoRead), actual);
+
+        verify(userService, times(1))
+                .updateUser(new UserDtoUpdate("name", "email@mail.ru"), 1);
     }
 
     @SneakyThrows
