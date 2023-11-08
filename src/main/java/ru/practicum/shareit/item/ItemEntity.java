@@ -1,7 +1,10 @@
 package ru.practicum.shareit.item;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import ru.practicum.shareit.request.RequestEntity;
 import ru.practicum.shareit.user.UserEntity;
 
 import javax.persistence.*;
@@ -14,6 +17,8 @@ import java.util.Set;
  */
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "item")
 public class ItemEntity {
     @Id
@@ -32,6 +37,9 @@ public class ItemEntity {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "item", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<CommentEntity> comments = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private RequestEntity request;
 
     @Override
     public boolean equals(Object o) {
