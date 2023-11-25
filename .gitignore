@@ -3,7 +3,9 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+!**/gateway/**/checkstyle.xml
+!**/server/**/checkstyle.xml
+checkstyle.xml
 ### STS ###
 .apt_generated
 .classpath
