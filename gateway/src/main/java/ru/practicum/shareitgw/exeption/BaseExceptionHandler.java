@@ -30,7 +30,7 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ErrorDto> handleException(Throwable ex) {
-        return handleException(ex, HttpStatus.SERVICE_UNAVAILABLE);
+        return handleException(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<ErrorDto> handleException(Throwable ex, HttpStatus httpStatus) {
