@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exeption.BadRequestException;
@@ -38,15 +37,6 @@ public class UserService {
     }
 
     public UserDtoRead addUser(UserDtoAdd userDtoAdd) {
-        if (StringUtils.isBlank(userDtoAdd.getName())) {
-            throw new BadRequestException("Имя не может быть пустым");
-        }
-        if (StringUtils.isBlank(userDtoAdd.getEmail())) {
-            throw new BadRequestException("Email не может быть пустым");
-        }
-        if (!EMAIL_REGEXP.matcher(userDtoAdd.getEmail()).matches()) {
-            throw new BadRequestException("Email не валидный");
-        }
         UserEntity userEntity = mapper.userDtoAddToUserEntity(userDtoAdd);
           repository.save(userEntity);
         return mapper.entityToUserDtoForRead(userEntity);

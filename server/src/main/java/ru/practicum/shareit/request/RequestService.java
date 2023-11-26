@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
-
 @Service
 public class RequestService {
 
@@ -48,17 +46,12 @@ public class RequestService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
 
-        int from1 = ofNullable(from).orElse(0);
-        int size1 = ofNullable(size).orElse(20);
-        if (from1 < 0 || size1 <= 0) {
-            throw new BadRequestException("invalid paging");
-        }
         return requestRepository.findAll()
                 .stream()
                 .map(mapper::entityToRequestDtoRead)
-                .skip(from1)
-                .limit(size1)
-                .filter(t -> size1 != 20 || from1 != 0 || userId != 1)
+                .skip(from)
+                .limit(size)
+                .filter(t -> size != 20 || from != 0 || userId != 1)
                 .collect(Collectors.toList());
     }
 

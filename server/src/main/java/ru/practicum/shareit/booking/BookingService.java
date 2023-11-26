@@ -12,7 +12,6 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.UserEntity;
 import ru.practicum.shareit.user.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -44,11 +43,7 @@ public class BookingService {
         if (!Arrays.asList("CURRENT", "PAST", "FUTURE", "ALL", "REJECTED", "WAITING").contains(state)) {
             throw new BadRequestException(String.format("Unknown state: %s", state));
         }
-        int from1 = ofNullable(from).orElse(0);
-        int size1 = ofNullable(size).orElse(10000);
-        if (from1 < 0 || size1 <= 0) {
-            throw new BadRequestException("invalid paging");
-        }
+
         userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
         Comparator<BookingDtoRead> comparator = Comparator
@@ -58,8 +53,8 @@ public class BookingService {
                 .stream()
                 .map(bookingMapper::entityToBookingDtoRead)
                 .sorted(comparator)
-                .skip(from1)
-                .limit(size1)
+                .skip(from)
+                .limit(size)
                 .collect(Collectors.toList());
     }
 
@@ -67,19 +62,15 @@ public class BookingService {
         if (!Arrays.asList("CURRENT", "PAST", "FUTURE", "ALL", "REJECTED", "WAITING").contains(state)) {
             throw new BadRequestException(String.format("Unknown state: %s", state));
         }
-        int from1 = ofNullable(from).orElse(0);
-        int size1 = ofNullable(size).orElse(10000);
-        if (from1 < 0 || size1 <= 0) {
-            throw new BadRequestException("invalid paging");
-        }
+
         userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
         return bookingRepository.findByOwnerIdAndState(id, state)
                 .stream()
                 .map(bookingMapper::entityToBookingDtoRead)
                 .sorted(Comparator.comparing(BookingDtoRead::getStart).reversed())
-                .skip(from1)
-                .limit(size1)
+                .skip(from)
+                .limit(size)
                 .collect(Collectors.toList());
     }
 
@@ -103,19 +94,6 @@ public class BookingService {
     }
 
     public BookingDtoRead addBooking(BookingDtoAdd bookingDtoAdd, Integer idUser) {
-        ofNullable(bookingDtoAdd.getItemId())
-                .orElseThrow(() -> new BadRequestException("Не задан обязательный параметр ItemId"));
-        ofNullable(bookingDtoAdd.getStart())
-                .orElseThrow(() -> new BadRequestException("Не задан обязательный параметр Start или Start указан позже End"));
-        if (LocalDateTime.now().isAfter(bookingDtoAdd.getStart())) {
-            throw new BadRequestException("Start не может быть раньше текущей даты");
-        }
-        if (bookingDtoAdd.getStart().equals(bookingDtoAdd.getEnd())) {
-            throw new BadRequestException("Start не может содержать End");
-        }
-        ofNullable(bookingDtoAdd.getEnd())
-                .filter(en -> en.isAfter(bookingDtoAdd.getStart()))
-                .orElseThrow(() -> new BadRequestException("Не задан обязательный параметр End или End указан раньше Start"));
         UserEntity user = userRepository.findById(idUser)
                 .orElseThrow(() -> new ResourceNotFoundException(MESSAGE_NO_USER_FOUND));
         ItemEntity item = itemRepository.findById(bookingDtoAdd.getItemId())

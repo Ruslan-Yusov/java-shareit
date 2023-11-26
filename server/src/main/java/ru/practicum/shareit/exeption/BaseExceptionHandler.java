@@ -4,14 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exeption.dto.ErrorDto;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class BaseExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
@@ -29,12 +29,12 @@ public class BaseExceptionHandler {
         return handleException(ex, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorDto> handleException(RuntimeException ex) {
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ErrorDto> handleException(Throwable ex) {
         return handleException(ex, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
-    private ResponseEntity<ErrorDto> handleException(Exception ex, HttpStatus httpStatus) {
+    private ResponseEntity<ErrorDto> handleException(Throwable ex, HttpStatus httpStatus) {
         log.error("Error: " + ex.getMessage(), ex);
         ErrorDto errorResponse = ErrorDto.builder()
                 .code(httpStatus.value())

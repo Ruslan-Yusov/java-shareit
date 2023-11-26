@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.UserEntity;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -57,10 +56,7 @@ public class ItemService {
     }
 
     public List<ItemDtoRead> findBySubstr(String namePart) {
-        return StringUtils.isBlank(namePart)
-                ? new ArrayList<>()
-                :
-                repository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(namePart, namePart)
+        return repository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(namePart, namePart)
                         .stream()
                         .filter(ItemEntity::getAvailable)
                         .map(mapper::entityToItemDtoRead)
@@ -94,11 +90,6 @@ public class ItemService {
     }
 
     public ItemDtoRead addItem(ItemDtoAdd itemDtoAdd, Integer userId) {
-        ofNullable(itemDtoAdd.getAvailable())
-                .orElseThrow(() -> new BadRequestException("Укажите статус доступности вещи"));
-        if (StringUtils.isBlank(itemDtoAdd.getName()) || StringUtils.isEmpty(itemDtoAdd.getDescription())) {
-            throw new BadRequestException("Имя не может быть пустым");
-        }
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Такого пользователя нет"));
         ItemEntity itemEntity = mapper.itemDtoAddToEntityItem(itemDtoAdd);
