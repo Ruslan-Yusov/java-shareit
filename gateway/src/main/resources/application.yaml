@@ -1,0 +1,20 @@
+server:
+  port: 8080
+spring:
+  banner:
+    location: banner-gw.txt
+  application:
+    name: shareit-gateway
+logging:
+  level:
+    root: INFO
+
+shareit-gateway:
+  services:
+    user: /users
+    booking: /bookings
+    item: /items
+    request: /requests
+  client:
+    url: ${SHAREIT_SERVER_URL:http://localhost:9090}
+

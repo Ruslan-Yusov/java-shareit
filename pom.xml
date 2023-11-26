@@ -6,108 +6,59 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.7.13</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 
-	<groupId>ru.practicum</groupId>
+	<packaging>pom</packaging>
+    <groupId>ru.practicum</groupId>
 	<artifactId>shareit</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-
 	<name>ShareIt</name>
 
+	<modules>
+		<module>gateway</module>
+		<module>server</module>
+	</modules>
+
 	<properties>
-		<java.version>11</java.version>
-		<kotlin.version>1.9.20-Beta2</kotlin.version>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<kotlin.version>1.9.0</kotlin.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring-boot.version>2.7.13</spring-boot.version>
+		<kotlin.logging.version>3.0.4</kotlin.logging.version>
 	</properties>
 
 	<dependencies>
-		<!--<editor-fold desc="Spring">-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-jpa</artifactId>
-		</dependency>
-		<!--</editor-fold>-->
 
-		<!--<editor-fold desc="Codegen">-->
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
-			<version>1.5.5.Final</version>
+			<version>1.5.1.Final</version>
 		</dependency>
 		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-		</dependency>
-		<!--</editor-fold>-->
-
-		<!--<editor-fold desc="DB">-->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>2.2.220</version>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>6.2.5.Final</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.14</version>
 		</dependency>
-		<!--</editor-fold>-->
+		<!--region Kotlin-->
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.15.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.12.0</version>
-		</dependency>
-
-		<!--<editor-fold desc="Test">-->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.9.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.9.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-			<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-stdlib-jdk8</artifactId>
 			<version>${kotlin.version}</version>
@@ -118,29 +69,29 @@
 			<version>${kotlin.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!--</editor-fold>-->
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-reactor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-jdk8</artifactId>
+		</dependency>
+		<dependency>
+			<!-- remove if dont need debugger -->
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.microutils</groupId>
+			<artifactId>kotlin-logging-jvm</artifactId>
+			<version>${kotlin.logging.version}</version>
+		</dependency>
+		<!--endregion-->
 	</dependencies>
 
 	<build>
-<!--		<resources>-->
-<!--			<resource>-->
-<!--				<directory>src/main/resources</directory>-->
-<!--				<filtering>true</filtering>-->
-<!--			</resource>-->
-<!--		</resources>-->
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<artifactId>kotlin-maven-plugin</artifactId>
@@ -148,15 +99,16 @@
 				<executions>
 					<execution>
 						<id>compile</id>
-						<phase>process-sources</phase>
+						<phase>compile</phase>
 						<goals>
 							<goal>compile</goal>
 						</goals>
 						<configuration>
 							<sourceDirs>
-								<source>src/main/java</source>
-								<source>target/generated-sources/annotations</source>
-								<source>src/main/kotlin</source>
+								<source>server/src/main/java</source>
+								<source>server/src/main/kotlin</source>
+								<source>gateway/src/main/java</source>
+								<source>gateway/src/main/kotlin</source>
 							</sourceDirs>
 						</configuration>
 					</execution>
@@ -168,20 +120,19 @@
 						</goals>
 						<configuration>
 							<sourceDirs>
-								<source>src/test/java</source>
-								<source>target/generated-test-sources/test-annotations</source>
+								<source>server/src/test</source>
+								<source>gateway/src/test</source>
 							</sourceDirs>
 						</configuration>
 					</execution>
 				</executions>
 				<configuration>
-					<jvmTarget>1.8</jvmTarget>
+					<jvmTarget>${maven.compiler.target}</jvmTarget>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
 				<executions>
 					<execution>
 						<id>default-compile</id>
@@ -206,166 +157,45 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<source>11</source>
-					<target>11</target>
-					<compilerArgs>
-						<arg>-parameters</arg>
-						<arg>-Xlint:all</arg>
-					</compilerArgs>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
-						</path>
-						<path>
-							<groupId>org.mapstruct</groupId>
-							<artifactId>mapstruct-processor</artifactId>
-							<version>1.5.3.Final</version>
-						</path>
-						<path>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-configuration-processor</artifactId>
-							<version>${project.parent.version}</version>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<configuration>
-						<systemPropertyVariables>
-							<spring.profiles.active>test</spring.profiles.active>
-						</systemPropertyVariables>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>3.1.2</version>
-					<configuration>
-						<configLocation>checkstyle.xml</configLocation>
-						<failOnViolation>true</failOnViolation>
-						<logViolationsToConsole>true</logViolationsToConsole>
-						<includeTestSourceDirectory>true</includeTestSourceDirectory>
-					</configuration>
-					<executions>
-						<execution>
-							<goals>
-								<goal>check</goal>
-							</goals>
-							<phase>compile</phase>
-						</execution>
-					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>com.puppycrawl.tools</groupId>
-							<artifactId>checkstyle</artifactId>
-							<version>10.2</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>com.github.spotbugs</groupId>
-					<artifactId>spotbugs-maven-plugin</artifactId>
-					<version>4.7.0.0</version>
-					<configuration>
-						<effort>Max</effort>
-						<threshold>High</threshold>
-					</configuration>
-					<executions>
-						<execution>
-							<goals>
-								<goal>check</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.8</version>
-					<configuration>
-						<output>file</output>
-						<excludes>
-							<exclude>**/*Mapper.*</exclude>
-							<exclude>**/*Repository.*</exclude>
-							<exclude>**/*Dto*.*</exclude>
-							<exclude>**/*Entity.*</exclude>
-							<exclude>**/*Impl.*</exclude>
-							<exclude>**/*Handler.*</exclude>
-						</excludes>
-					</configuration>
-					<executions>
-						<execution>
-							<id>jacoco-initialize</id>
-							<goals>
-								<goal>prepare-agent</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>jacoco-check</id>
-							<goals>
-								<goal>check</goal>
-							</goals>
-							<configuration>
-								<rules>
-									<rule>
-										<element>BUNDLE</element>
-										<limits>
-											<limit>
-												<counter>INSTRUCTION</counter>
-												<value>COVEREDRATIO</value>
-												<minimum>0.01</minimum>
-											</limit>
-											<limit>
-												<counter>LINE</counter>
-												<value>COVEREDRATIO</value>
-												<minimum>0.9</minimum>
-											</limit>
-											<limit>
-												<counter>BRANCH</counter>
-												<value>COVEREDRATIO</value>
-												<minimum>0.6</minimum>
-											</limit>
-											<limit>
-												<counter>COMPLEXITY</counter>
-												<value>COVEREDRATIO</value>
-												<minimum>0.6</minimum>
-											</limit>
-											<limit>
-												<counter>METHOD</counter>
-												<value>COVEREDRATIO</value>
-												<minimum>0.7</minimum>
-											</limit>
-											<limit>
-												<counter>CLASS</counter>
-												<value>MISSEDCOUNT</value>
-												<maximum>1</maximum>
-											</limit>
-										</limits>
-									</rule>
-								</rules>
-							</configuration>
-						</execution>
-						<execution>
-							<id>jacoco-report</id>
-							<phase>test</phase>
-							<goals>
-								<goal>report</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
+
 	<profiles>
+		<profile>
+			<id>ssl-insecure</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>shareit-main-profile</id>
+			<!--activation>
+                <activeByDefault>true</activeByDefault>
+            </activation-->
+			<activation>
+				<file>
+					<exists>.</exists>
+				</file>
+			</activation>
+			<repositories>
+				<!-- Default profile at my PC disables default maven repository, i have to override this -->
+				<repository>
+					<id>central</id>
+					<name>Default Repository</name>
+					<layout>default</layout>
+					<url>https://repo1.maven.org/maven2</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</repository>
+				<repository>
+					<id>jcenter</id>
+					<name>bintray</name>
+					<url>https://jcenter.bintray.com</url>
+				</repository>
+			</repositories>
+		</profile>
 		<profile>
 			<id>check</id>
 			<build>
@@ -373,10 +203,12 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-checkstyle-plugin</artifactId>
+						<version>3.3.0</version>
 					</plugin>
 					<plugin>
 						<groupId>com.github.spotbugs</groupId>
 						<artifactId>spotbugs-maven-plugin</artifactId>
+						<version>4.7.3.2</version>
 					</plugin>
 				</plugins>
 			</build>
@@ -385,20 +217,10 @@
 					<plugin>
 						<groupId>com.github.spotbugs</groupId>
 						<artifactId>spotbugs-maven-plugin</artifactId>
+						<version>4.7.3.2</version>
 					</plugin>
 				</plugins>
 			</reporting>
-		</profile>
-		<profile>
-			<id>coverage</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 	</profiles>
 </project>
